@@ -27,6 +27,7 @@ import org.reactivestreams.Publisher;
 import com.arjuna.ats.jta.logging.jtaLogger;
 
 import io.quarkus.arc.runtime.InterceptorBindings;
+import io.quarkus.narayana.jta.DontRollback;
 import io.quarkus.narayana.jta.runtime.CDIDelegatingTransactionManager;
 import io.quarkus.narayana.jta.runtime.TransactionConfiguration;
 import io.smallrye.mutiny.Multi;
@@ -337,6 +338,10 @@ public abstract class TransactionalInterceptorBase implements Serializable {
                 tx.setRollbackOnly();
                 return;
             }
+        }
+
+        if (t.getClass().isAnnotationPresent(DontRollback.class)) {
+            return;
         }
 
         // RuntimeException and Error are un-checked exceptions and rollback is expected
